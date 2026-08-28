@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+.qa/
+qa/
+qa*.png
+public/media/video-4k60/*.mp4
+public/media/video/
+public/media/video-graded/
+scripts/__pycache__/

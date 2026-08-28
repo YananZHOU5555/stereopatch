@@ -1,0 +1,55 @@
+---
+import { tasks } from "../content/evidence";
+---
+
+<section class="section task-section" id="tasks" aria-labelledby="tasks-title">
+  <div class="section-heading split-heading">
+    <div>
+      <p class="kicker">02 · Six real-robot demands</p>
+      <h2 id="tasks-title">One representation interface.<br /><em>Task-specific policies.</em></h2>
+    </div>
+    <p>
+      The task suite changes what spatial distinction matters: destination, source,
+      near-patch-scale target, stage transition, contact height, or metric reach.
+      Each clip is qualitative evidence from a selected execution; closed-loop tables
+      carry the success claims.
+    </p>
+  </div>
+
+  <div class="task-grid">
+    {tasks.map((task, index) => (
+      <article class="task-card" id={`task-${task.id}`}>
+        <div class="task-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
+        <div class="media-frame task-media">
+          <video
+            muted
+            playsinline
+            loop
+            preload="none"
+            poster={task.poster}
+            data-evidence-video
+            data-src={task.src}
+            aria-label={`Selected ${task.title} rollout`}
+          ></video>
+          <button class="media-toggle" type="button" aria-label={`Play ${task.title} video`} data-media-toggle>
+            <span aria-hidden="true">▶</span>
+          </button>
+        </div>
+        <div class="task-copy">
+          <div class="task-title-row">
+            <h3>{task.title}</h3>
+            <span>{task.duration}</span>
+          </div>
+          <div class="task-tags" aria-label={`${task.title} video metadata`}>
+            <span>{task.autonomy}</span>
+            <span>{task.coverage}</span>
+            <span>{task.playback}</span>
+          </div>
+          <p class="task-question">{task.question}</p>
+          <p class="task-caption">{task.caption}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+  <p class="task-playback-note">Playback multipliers describe video presentation only; policies execute at the recorded control rate.</p>
+</section>

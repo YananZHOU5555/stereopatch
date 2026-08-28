@@ -1,0 +1,128 @@
+---
+import { claims, taskMediaRoot } from "../content/evidence";
+const bowlStereoPatch = claims.find((claim) => claim.id === "bowl-stereopatch-dp")!;
+const bowlPi05 = claims.find((claim) => claim.id === "bowl-pi05-reference")!;
+const resultPercent = (claim: (typeof claims)[number]) =>
+  claim.numerator != null && claim.denominator != null
+    ? ((100 * claim.numerator) / claim.denominator).toFixed(1)
+    : "—";
+---
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero-masthead">
+    <div class="hero-meta-row">
+      <p class="kicker">Policy-facing spatial perception · RGB-indexed geometry retrieval</p>
+      <span>DINOv3 × DeFM · StereoPatch-ACT / DP</span>
+    </div>
+    <div class="hero-title-lockup">
+      <div class="hero-title-row">
+        <h1 id="hero-title"><span class="stereo-depth" data-text="Stereo">Stereo</span><span class="patch-word"><span class="patch-p">P<i aria-hidden="true"></i></span>atch</span></h1>
+      </div>
+      <p class="hero-claim">Spatial perception, where the policy already looks.</p>
+    </div>
+    <div class="hero-creditbar">
+      <p class="hero-authors" aria-label="Authors">
+        <a href="https://yananzhou.me/" target="_blank" rel="noreferrer">Yanan Zhou <span aria-hidden="true">↗</span></a>
+        <span aria-hidden="true">·</span>
+        <span>Zhaoyan Qian</span>
+        <span aria-hidden="true">·</span>
+        <span>James Zhao</span>
+        <span aria-hidden="true">·</span>
+        <a href="https://www.weimingzhi.com/home" target="_blank" rel="noreferrer">Weiming (William) Zhi <span aria-hidden="true">↗</span></a>
+      </p>
+      <div class="hero-affiliation">
+        <a class="usyd-lockup" href="https://www.sydney.edu.au/" target="_blank" rel="noreferrer" aria-label="The University of Sydney website">
+          <img
+            src="https://www.sydney.edu.au/content/dam/icons/logos/logo-usyd-dark.svg"
+            width="233"
+            height="80"
+            alt="The University of Sydney"
+            loading="eager"
+          />
+        </a>
+        <p>School of Computer Science<br /><strong>PAIR Lab</strong> · Physical AI &amp; Robotics</p>
+      </div>
+      <nav class="hero-resource-tags" aria-label="Paper and institutional resources">
+        <a href="paper/stereopatch-preprint.pdf">Paper <span aria-hidden="true">↗</span></a>
+        <a href="https://aus.bot/" target="_blank" rel="noreferrer">PAIR Lab <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="hero-support">
+    <p class="hero-deck">
+      <strong>StereoPatch</strong> builds policy-facing spatial perception by retrieving registered DeFM geometry into DINOv3
+      patch addresses before action decoding, forming one policy-facing visual field
+      for ACT or Diffusion Policy.
+    </p>
+    <nav class="hero-links" aria-label="Project resources">
+      <a href="paper/stereopatch-preprint.pdf">Paper <span aria-hidden="true">↗</span></a>
+      <a href="#method">Method <span aria-hidden="true">↓</span></a>
+      <a href="#tasks">Videos <span aria-hidden="true">↓</span></a>
+    </nav>
+  </div>
+
+  <figure class="hero-media evidence-media">
+    <div class="media-frame media-frame-hero">
+      <video
+        muted
+        playsinline
+        loop
+        preload="none"
+        poster="media/video-4k60/bowl.jpg"
+        data-evidence-video
+        data-src={`${taskMediaRoot}/bowl.mp4`}
+        data-priority="hero"
+        aria-label="Complete real-robot bowl-extraction rollout shown at four-times speed"
+      ></video>
+      <button class="media-toggle" type="button" aria-label="Play bowl-extraction video" data-media-toggle>
+        <span aria-hidden="true">▶</span>
+      </button>
+    </div>
+    <figcaption class="media-caption media-caption-wide">
+      <span><strong>Bowl extraction</strong> · complete edited real-robot execution</span>
+      <span>Autonomous · multi-position · 4× edited playback · 4K60 qualitative rollout</span>
+    </figcaption>
+  </figure>
+
+  <div class="hero-evidence" aria-label="Bowl-extraction results" data-reveal>
+    <article class="hero-metric hero-metric-primary" style={`--metric:${resultPercent(bowlStereoPatch)}%`}>
+      <div class="metric-value-block">
+        <span class="metric-kicker">Measured · {bowlStereoPatch.method}</span>
+        <span class="result-value">{resultPercent(bowlStereoPatch)}<small>%</small></span>
+        <div class="metric-rail" aria-hidden="true"><i></i></div>
+      </div>
+      <div class="metric-copy">
+        <strong>{bowlStereoPatch.method}</strong>
+        <p>Single-bowl extraction under the 80-trial protocol.</p>
+        <span class="metric-fraction">78 success · 0 empty · 2 multiple</span>
+      </div>
+    </article>
+    <article class="hero-metric hero-metric-reference" style={`--metric:${resultPercent(bowlPi05)}%`}>
+      <div class="metric-value-block">
+        <span class="metric-kicker">Measured system reference · {bowlPi05.method}</span>
+        <span class="result-value">{resultPercent(bowlPi05)}<small>%</small></span>
+        <div class="metric-rail" aria-hidden="true"><i></i></div>
+      </div>
+      <div class="metric-copy">
+        <strong>{bowlPi05.method}</strong>
+        <p>Complete-system reference on the same task protocol.</p>
+        <span class="metric-fraction">65 success · 5 empty · 10 multiple</span>
+      </div>
+    </article>
+    <article class="hero-contrast">
+      <div class="metric-value-block">
+        <span class="metric-kicker">Observed system-level contrast</span>
+        <span class="result-value">+13<small>/80</small></span>
+      </div>
+      <div class="metric-copy">
+        <strong>+16.25 percentage points</strong>
+        <p>Fewer empty or multi-bowl contacts across 80 evaluations.</p>
+      </div>
+    </article>
+    <p class="hero-evidence-note">
+      Bowl extraction · 16 states · 80 trials per system. Complete systems are compared contextually:
+      policy heads and training stacks differ, so this result does not isolate representation causality.
+    </p>
+  </div>
+</section>

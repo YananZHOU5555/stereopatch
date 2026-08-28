@@ -1,0 +1,434 @@
+---
+import {
+  latencyBudgets,
+  metricAmbiguity,
+  pegResults,
+  picnicResults,
+  positionResults,
+  simulationRows,
+  simulationTasks,
+  tasks,
+} from "../content/evidence";
+import DataEfficiencyChart from "./DataEfficiencyChart.astro";
+
+const percent = (value: number, denominator: number) => (100 * value) / denominator;
+const groupLabel: Record<string, string> = {
+  system: "System reference · contextual",
+  matched: "Matched perception controls",
+  context: "Cross-head context · not ranked",
+};
+const positionMetrics = [
+  { key: "seen" as const, label: "Seen" },
+  { key: "heldOut" as const, label: "Held-out" },
+  { key: "combined" as const, label: "Combined" },
+];
+const taskMedia = Object.fromEntries(tasks.map((task) => [task.id, task]));
+const simulationSuites = [
+  { id: "robomimic", name: "RoboMimic", tasks: simulationTasks.slice(0, 3), offset: 0 },
+  { id: "robofactory", name: "RoboFactory", tasks: simulationTasks.slice(3, 6), offset: 3 },
+  { id: "behavior", name: "BEHAVIOR-1K", tasks: simulationTasks.slice(6, 8), offset: 6 },
+];
+const ambiguityPanels = [
+  { id: "4", label: "4 bowls", height: "144.4" },
+  { id: "3", label: "3 bowls", height: "122.3" },
+  { id: "2", label: "2 bowls", height: "83.5" },
+  { id: "1", label: "1 bowl", height: "68.3" },
+];
+---
+
+<section class="section evidence-section" id="evidence" aria-labelledby="evidence-title">
+  <div class="section-heading section-heading-wide" data-reveal>
+    <p class="kicker">03 · Closed-loop evidence</p>
+    <h2 id="evidence-title">Read the denominator.<br /><em>Then read the result.</em></h2>
+    <p>
+      Matched closed-loop charts keep the observed count, protocol scope, and comparison boundary
+      visible; mixed-provenance benchmarks state what is reported. Motion guides the eye once.
+    </p>
+  </div>
+
+  <article class="evidence-block compatibility-block" id="compatibility">
+    <div class="evidence-intro" data-reveal>
+      <p class="evidence-number">RQ1</p>
+      <div>
+        <h3>Eight simulated tasks, two action heads, one complete result table.</h3>
+        <p>
+          The benchmark spans three suites with mixed provenance. The full table is shown without
+          pooling suites or presenting published references as in-house rollout counts.
+        </p>
+      </div>
+    </div>
+    <div class="compatibility-shell" data-reveal data-evidence-matrix>
+      <div class="chart-toolbar">
+        <div>
+          <span class="chart-overline">Representative benchmark tasks</span>
+          <h4>Task coverage above · reported success (%) below</h4>
+        </div>
+        <p>Frames visualize task identity · not StereoPatch rollout evidence</p>
+      </div>
+
+      <div class="simulation-paper-layout" aria-label="Eight representative simulation benchmark tasks grouped as in the paper">
+        {simulationSuites.map((suite) => (
+          <section class={`simulation-suite suite-${suite.id}`} aria-labelledby={`suite-${suite.id}`}>
+            <header class="simulation-suite-heading">
+              <span aria-hidden="true"></span><h5 id={`suite-${suite.id}`}>{suite.name}</h5><span aria-hidden="true"></span>
+            </header>
+            <div class="simulation-suite-tasks">
+              {suite.tasks.map((item, localIndex) => {
+                const index = suite.offset + localIndex;
+                return (
+                  <figure class="simulation-tile" data-col={index} data-matrix-task tabindex="0">
+                    <div class="simulation-media">
+                      {item.video ? (
+                        <video
+                          muted
+                          loop
+                          playsinline
+                          preload="metadata"
+                          poster={item.image}
+                          src={item.video}
+                          data-simulation-video
+                          aria-label={`Official ${item.task} benchmark task clip`}
+                        ></video>
+                      ) : (
+                        <img src={item.image} alt={`Representative ${item.task} benchmark frame`} loading="lazy" decoding="async" />
+                      )}
+                      {item.video && <span class="simulation-motion-badge" aria-hidden="true">Official clip · hover</span>}
+                    </div>
+                    <figcaption>
+                      <strong>{item.task}</strong>
+                      <span>{item.video ? "motion preview" : "official frame"}</span>
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div class="table-scroll table-scroll-matrix" tabindex="0" role="region" aria-label="Scrollable policy compatibility matrix">
+        <table class="compatibility-table">
+          <thead>
+            <tr class="suite-row">
+              <th rowspan="2" scope="col">Perception</th>
+              <th rowspan="2" scope="col">Method</th>
+              <th colspan="3" scope="colgroup">RoboMimic</th>
+              <th colspan="3" scope="colgroup">RoboFactory</th>
+              <th colspan="2" scope="colgroup">BEHAVIOR-1K</th>
+            </tr>
+            <tr class="task-row">
+              {simulationTasks.map((item, index) => <th scope="col" data-col={index}>{item.task}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {simulationRows.map((row) => (
+              <tr class:list={{ "is-proposed": row.proposed }}>
+                {row.perception && <th class="perception-cell" scope="rowgroup" rowspan={row.groupSpan}>{row.perception}</th>}
+                <th scope="row">{row.method}</th>
+                {row.values.map((value, index) => (
+                  <td
+                    data-matrix-cell
+                    data-col={index}
+                    tabindex="0"
+                    aria-label={`${row.method}, ${simulationTasks[index].task}: ${value} percent reported success`}
+                  >
+                    <span class="matrix-number">{value}<small>%</small></span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="simulation-provenance">
+        <p><strong>Task media.</strong> Exact task clips are downloaded from the <a href="https://robomimic.github.io/study/" target="_blank" rel="noreferrer">RoboMimic</a> and <a href="https://iranqin.github.io/robofactory/" target="_blank" rel="noreferrer">RoboFactory</a> project pages; static project frames remain where an exact downloadable clip is unavailable. These identify tasks only.</p>
+        <p><strong>RoboMimic.</strong> Non-StereoPatch rows are published percentages; StereoPatch rows use 100 demonstrations and 100 in-house rollouts.</p>
+        <p><strong>RoboFactory.</strong> In-house 100-demo/task results are rounded three-seed means over 100 rollouts.</p>
+        <p><strong>BEHAVIOR-1K.</strong> In-house 50-demo OmniGibson reproductions evaluated over 100 rollouts; no cross-suite pooled ranking.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="evidence-block position-block" id="position-learning">
+    <div class="evidence-intro" data-reveal>
+      <p class="evidence-number">RQ2</p>
+      <div>
+        <h3>Sparse anchors, fixed held-out coordinates.</h3>
+        <p>
+          Placement varies the destination; object picking varies the source. Comparisons stay
+          within task because the matched action heads and trial counts differ.
+        </p>
+      </div>
+    </div>
+    <figure class="paper-figure protocol-figure protocol-figure-large" data-reveal>
+      <img src="media/figures/position-protocols.png" alt="Training-anchor coverage for placement and object picking" width="1969" height="640" loading="lazy" decoding="async" />
+      <div class="protocol-meta" aria-label="Fixed held-out position protocol">
+        <span><b>A</b> 20 placement · 37 picking anchors</span>
+        <span><b>K</b> 2 trajectories per anchor at the fixed-budget comparison</span>
+        <span><b>Split</b> seen coordinates vs fixed interstitial / bounded extrapolation coordinates</span>
+        <span><b>Trials</b> 40 / 74 per split</span>
+      </div>
+      <figcaption>White-matte protocol plate · destination varies for placement; source varies for object picking.</figcaption>
+    </figure>
+
+    <div class="position-results-grid comparison-panels" data-reveal data-animate-bars>
+      {positionResults.map((result) => (
+        <section class="position-result-card" aria-labelledby={`position-${result.task.replaceAll(" ", "-")}`}>
+          <div class="chart-title-row">
+            <div>
+              <span class="chart-overline">{result.matchedHead} matched head · A = {result.anchorCount}</span>
+              <h4 id={`position-${result.task.replaceAll(" ", "-")}`}>{result.task}</h4>
+            </div>
+            <span>n = {result.splitDenominator} / split</span>
+          </div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label={`${result.task} seen, held-out, and combined success`}>
+            <table class="position-result-table">
+              <thead><tr><th scope="col">Method</th>{positionMetrics.map((metric) => <th scope="col">{metric.label}</th>)}</tr></thead>
+              <tbody>
+                {result.rows.map((row, index) => (
+                  <>
+                    {(index === 0 || row.group !== result.rows[index - 1]?.group) && <tr class={`position-group-row group-${row.group}`}><th colspan="4">{groupLabel[row.group]}</th></tr>}
+                    <tr class={`tone-${row.tone}`} data-method-family={row.tone}>
+                      <th scope="row">{row.method}</th>
+                      {positionMetrics.map((metric) => {
+                        const denominator = metric.key === "combined" ? result.combinedDenominator : result.splitDenominator;
+                        const value = row[metric.key];
+                        return (
+                          <td class="position-metric-cell">
+                            <span><b>{value}/{denominator}</b><small>{percent(value, denominator).toFixed(1)}%</small></span>
+                            <i style={`--value:${percent(value, denominator)}%`} aria-hidden="true"></i>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <DataEfficiencyChart />
+    <p class="takeaway" data-reveal><strong>Bounded takeaway.</strong> The task-matched StereoPatch head is +10.0 pp on placement and +10.8 pp on picking versus the π0.5-FT system reference. The 60/74 ACT picking row is cross-head context and is not used for that matched comparison.</p>
+  </article>
+
+  <article class="evidence-block ambiguity-block" id="metric-ambiguity">
+    <div class="evidence-intro" data-reveal>
+      <p class="evidence-number">RQ3</p>
+      <div>
+        <h3>Depth availability alone does not reproduce the observed result.</h3>
+        <p>
+          Similar RGB support spans 76.1 mm in registered median bowl height. The ACT ladder
+          holds demonstrations, evaluation states, action head, and success predicates fixed.
+        </p>
+      </div>
+    </div>
+    <div class="ambiguity-chain" data-reveal aria-label="Three-link metric ambiguity evidence chain">
+      <article><span>01 · Input</span><b>76.1 mm</b><p>registered height span under similar RGB support</p></article>
+      <article><span>02 · Response</span><b>2.9–5.5×</b><p>n = 3 archived swaps; sensitivity only—not action direction or rollout-linked success</p></article>
+      <article><span>03 · Closed loop</span><b>+12.5 / +15.0 pp</b><p>bowl / cup gain over matched unbound RGB–depth</p></article>
+    </div>
+
+    <figure class="paper-figure transparent-figure depth-strip-figure depth-strip-native" data-reveal>
+      <div class="depth-strip-scroll" tabindex="0" role="region" aria-label="Four similar RGB bowl crops paired with registered metric-height maps on one shared 0 to 160 millimeter scale">
+        <div class="depth-strip-grid">
+          <span class="depth-row-label depth-row-label-rgb">RGB</span>
+          {ambiguityPanels.map((panel) => (
+            <section class="depth-panel depth-panel-rgb" aria-label={`${panel.label} RGB crop`}>
+              <strong>{panel.label}</strong>
+              <img src={`media/figures/depth-ambiguity/rgb-${panel.id}.png`} alt="" width="458" height="235" loading="lazy" decoding="async" />
+            </section>
+          ))}
+          <span class="depth-row-label depth-row-label-height">Height</span>
+          {ambiguityPanels.map((panel) => (
+            <section class="depth-panel depth-panel-height" aria-label={`${panel.label}, median registered height ${panel.height} millimeters`}>
+              <img src={`media/figures/depth-ambiguity/height-${panel.id}.png`} alt="" width="458" height="235" loading="lazy" decoding="async" />
+              <strong>{panel.height}</strong>
+            </section>
+          ))}
+          <div class="depth-color-scale" aria-hidden="true">
+            <b>mm</b>
+            <div><img src="media/figures/depth-ambiguity/turbo-0-160.png" alt="" width="24" height="512" /><span class="tick tick-160">160</span><span class="tick tick-80">80</span><span class="tick tick-0">0</span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption>Registered metric variation · shared 0–160 mm color scale · median bowl height 144.4 → 68.3 mm.</figcaption>
+    </figure>
+
+    <div class="ambiguity-outcome-grid">
+      <figure class="paper-figure transparent-figure contact-figure" data-reveal>
+        <img src="media/figures/contact-outcomes-transparent.png" alt="Empty, single-bowl, and multi-bowl contact outcomes" width="2118" height="742" loading="lazy" decoding="async" />
+        <figcaption>Signed outcomes · too high → Empty; valid band → Single; too low → Multi.</figcaption>
+      </figure>
+
+      <div class="ambiguity-metrics" data-reveal data-animate-bars aria-label="Matched ACT metric ambiguity results">
+        <div class="chart-toolbar">
+          <div><span class="chart-overline">Matched ACT perception controls</span><h4>Success and signed bowl failures</h4></div>
+          <p>bowl n = 80 · cup n = 20</p>
+        </div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable matched ACT ambiguity table">
+          <table class="ambiguity-table">
+            <thead><tr><th scope="col">Method</th><th scope="col">Bowl ↑</th><th scope="col">Empty ↓</th><th scope="col">Multi. ↓</th><th scope="col">Cup ↑</th></tr></thead>
+            <tbody>
+              {metricAmbiguity.map((row) => (
+                <tr class={`tone-${row.tone}`}>
+                  <th scope="row">{row.method}</th>
+                  {[
+                    { value: row.bowl, denominator: 80, kind: "success" },
+                    { value: row.empty, denominator: 80, kind: "failure" },
+                    { value: row.multi, denominator: 80, kind: "failure" },
+                    { value: row.cup, denominator: 20, kind: "success" },
+                  ].map((metric) => (
+                    <td class:list={["ambiguity-metric", `is-${metric.kind}`]}>
+                      <span><b>{metric.value}/{metric.denominator}</b><small>{percent(metric.value, metric.denominator).toFixed(1)}%</small></span>
+                      <i style={`--value:${percent(metric.value, metric.denominator)}%`} aria-hidden="true"></i>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="chart-footnote">Empty and Multi. are signed, non-exhaustive bowl-failure categories.</p>
+      </div>
+    </div>
+    <p class="takeaway" data-reveal><strong>Interpretation boundary.</strong> The ordering favors an associated appearance–geometry condition before action decoding, but the finite ladder does not identify a unique internal mechanism. System references and cross-head DP rows remain contextual and are not ranked in this matched ACT table.</p>
+  </article>
+
+  <article class="evidence-block stress-block" id="resolution">
+    <div class="evidence-intro" data-reveal>
+      <p class="evidence-number">RQ4</p>
+      <div>
+        <h3>Fine-scale and multi-stage control expose where failures accumulate.</h3>
+        <p>
+          Peg insertion fixes 72 trials per condition; picnic-bag packing keeps the same
+          24-rollout denominator at every cumulative milestone.
+        </p>
+      </div>
+    </div>
+
+    <section class="stress-subsection" aria-labelledby="peg-title">
+      <div class="subsection-heading" data-reveal>
+        <div><span class="chart-overline">Fine-scale target</span><h4 id="peg-title">Peg insertion across token grids</h4></div>
+        <p>6 bar positions × 6 peg positions × 2 attempts</p>
+      </div>
+      <div class="peg-layout">
+        <div class="rq4-visual-rail" data-reveal>
+          <figure class="evidence-demo">
+            <div class="media-frame evidence-demo-frame">
+              <video muted playsinline loop preload="none" poster={taskMedia.peg.poster} data-evidence-video data-src={taskMedia.peg.src} aria-label="Autonomous multi-position peg-insertion edit"></video>
+              <button class="media-toggle" type="button" aria-label="Play peg-insertion video" data-media-toggle><span aria-hidden="true">▶</span></button>
+            </div>
+            <figcaption><strong>Peg insertion demo</strong><span>Autonomous · multi-position · 4× edited playback</span></figcaption>
+          </figure>
+          <figure class="paper-figure latent-figure">
+            <img src="media/figures/latent-resolution.png" alt="Peg support at 10 by 20, 20 by 40, and 30 by 60 token grids" width="4080" height="1056" loading="lazy" />
+            <figcaption>N<sub>eff</sub> is a render-level selectivity diagnostic from independently normalized views—not a cross-resolution activation metric.</figcaption>
+          </figure>
+        </div>
+        <div class="stage-table-shell" data-reveal data-animate-bars>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable peg insertion milestone table">
+            <table class="stage-table">
+              <caption>Matched Diffusion Policy · cumulative successes / 72</caption>
+              <thead><tr><th scope="col">Perception</th><th scope="col">Grid</th><th scope="col">Pick bar</th><th scope="col">Pick peg</th><th scope="col">Complete</th></tr></thead>
+              <tbody>
+                {pegResults.map((row) => (
+                  <tr class:list={{ [`tone-${row.tone}`]: true, "is-selected": row.best }}>
+                    <th scope="row">{row.method}{row.best && <small class="selected-tag">selected</small>}</th>
+                    <td class="grid-cell">{row.grid}</td>
+                    {[row.bar, row.peg, row.task].map((value, stageIndex) => (
+                      <td class="stage-cell" style={`--stage-delay:${stageIndex * 100}ms`}><span><b>{value}</b><small>/72 · {percent(value, 72).toFixed(1)}%</small></span><i style={`--value:${percent(value, 72)}%`} aria-hidden="true"></i></td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stress-subsection picnic-subsection" aria-labelledby="picnic-title">
+      <div class="subsection-heading" data-reveal>
+        <div><span class="chart-overline">Stage-dependent target</span><h4 id="picnic-title">Picnic-bag cumulative milestones</h4></div>
+        <p>Each column retains the same n = 24 denominator</p>
+      </div>
+      <div class="picnic-layout">
+        <figure class="evidence-demo" data-reveal>
+          <div class="media-frame evidence-demo-frame">
+            <video muted playsinline loop preload="none" poster={taskMedia.picnic.poster} data-evidence-video data-src={taskMedia.picnic.src} aria-label="Autonomous multi-position picnic-bag edit"></video>
+            <button class="media-toggle" type="button" aria-label="Play picnic-bag video" data-media-toggle><span aria-hidden="true">▶</span></button>
+          </div>
+          <figcaption><strong>Picnic-bag demo</strong><span>Autonomous · multi-position · 4× edited playback</span></figcaption>
+        </figure>
+        <div class="stage-table-shell" data-reveal data-animate-bars>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable picnic-bag milestone table">
+            <table class="stage-table picnic-table">
+              <caption>Grasp the drink, reselect and grasp the bread, then complete the task</caption>
+              <thead><tr><th scope="col">Perception</th><th scope="col">Drink grasp</th><th scope="col">Bread grasp</th><th scope="col">Complete</th></tr></thead>
+              <tbody>
+                {picnicResults.map((row) => (
+                  <tr class:list={{ [`tone-${row.tone}`]: true, "is-selected": row.best }}>
+                    <th scope="row">{row.method}{row.best && <small class="selected-tag">selected</small>}</th>
+                    {[row.drink, row.bread, row.task].map((value, stageIndex) => (
+                      <td class="stage-cell" style={`--stage-delay:${stageIndex * 100}ms`}><span><b>{value}</b><small>/24 · {percent(value, 24).toFixed(1)}%</small></span><i style={`--value:${percent(value, 24)}%`} aria-hidden="true"></i></td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="chart-footnote picnic-footnote">Cumulative counts show where progress remains visible after the target changes; they are not transition-conditional rates.</p>
+    </section>
+  </article>
+
+  <article class="evidence-block latency-block" id="latency">
+    <div class="evidence-intro" data-reveal>
+      <p class="evidence-number">RQ5</p>
+      <div>
+        <h3>ACT and DDIM-4 fit the tested 30 Hz componentwise budget.</h3>
+        <p>
+          Six measured components, four componentwise serial sums, and one separate π0.5-FT
+          reference are shown. Serial sums add matching marginal quantiles and are not
+          synchronized end-to-end latency.
+        </p>
+      </div>
+    </div>
+    <div class="latency-chart" data-reveal data-animate-latency aria-label="Reported warm batch-one measured components, serial estimates, and contextual latency reference">
+      <div class="chart-toolbar">
+        <div><span class="chart-overline">Reported warm batch-1 timing breakdown</span><h4>p50 bar · p50→p95 tail · budget status</h4></div>
+        <p>0–70 ms · lower is better</p>
+      </div>
+      <div class="latency-ruler" aria-hidden="true">
+        <span></span>
+        <div><i style="left:0">0</i><i class="budget-30" style="left:47.62%">33.3 · 30 Hz</i><i class="budget-20" style="left:71.43%">50 · 20 Hz</i><i style="left:100%">70 ms</i></div>
+        <span>p50 / p95</span><span>budget</span>
+      </div>
+      {latencyBudgets.map((row, index) => (
+        <>
+          {(index === 0 || row.group !== latencyBudgets[index - 1]?.group) && <div class="latency-group"><span>{row.group}</span></div>}
+          <div class:list={["latency-row", `status-${row.status}`]} style={`--row-delay:${index * 75}ms`}>
+            <span>{row.method}</span>
+            <div class="latency-track" aria-hidden="true">
+              <span class="budget-zone budget-zone-30"></span><span class="budget-zone budget-zone-20"></span>
+              <span class="budget-line budget-line-30"></span><span class="budget-line budget-line-20"></span>
+              <i class="p50-bar" style={`--p50:${(row.p50 / 70) * 100}%`}></i>
+              <i class="p95-tail" style={`--p50:${(row.p50 / 70) * 100}%;--tail:${((row.p95 - row.p50) / 70) * 100}%`}></i>
+              <b class="p50-point" style={`--p50:${(row.p50 / 70) * 100}%`}></b>
+              <b class="p95-cap" style={`--p95:${(row.p95 / 70) * 100}%`}></b>
+            </div>
+            <strong><span><small>p50</small><b>{row.p50.toFixed(2)}</b></span><span><small>p95</small>{row.p95.toFixed(2)} ms</span></strong>
+            <em>{row.budget}</em>
+          </div>
+        </>
+      ))}
+      <div class="latency-legend"><span><i class="legend-p50"></i>p50</span><span><i class="legend-p95"></i>p50→p95</span><span>Warm batch-1 · RTX 5090</span></div>
+    </div>
+    <p class="chart-footnote" data-reveal>Serial rows add matching marginal quantiles rather than jointly timed end-to-end quantiles. The π0.5-FT row is a separate no-FastFS system reference. Sample count, exact synchronization boundary, contention, queueing, transfer overhead, and observation age were not retained.</p>
+  </article>
+</section>

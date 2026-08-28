@@ -1,0 +1,231 @@
+---
+const defaultStage = "retrieval";
+
+const stages = [
+  {
+    id: "observation",
+    index: "01",
+    label: "Registered observation",
+    center: 470,
+    role: "input",
+    description:
+      "Top-view stereo is converted into an RGB image and a registered metric-depth map; both preserve the same image-plane coordinates.",
+    regions: [{ x: 28, y: 106, width: 885, height: 958, radius: 26 }],
+  },
+  {
+    id: "dual",
+    index: "02",
+    label: "Dual patch fields",
+    center: 1441,
+    role: "dual",
+    description:
+      "Frozen DINOv3 and DeFM produce semantic and geometric patch fields on a shared Hₚ × Wₚ lattice.",
+    regions: [{ x: 910, y: 107, width: 1062, height: 959, radius: 26 }],
+  },
+  {
+    id: "retrieval",
+    index: "03",
+    label: "RGB-indexed retrieval",
+    center: 2716,
+    role: "retrieval",
+    description:
+      "RGB patches form the queries; the compatible depth field supplies keys and values. A learned 2-D bias retains image-space structure over two retrieval layers.",
+    regions: [{ x: 2034, y: 94, width: 1364, height: 956, radius: 26 }],
+  },
+  {
+    id: "tokens",
+    index: "04",
+    label: "StereoPatch tokens",
+    center: 3637,
+    role: "tokens",
+    description:
+      "Only the updated RGB-indexed field R² is exposed to the policy, carrying semantic identity plus retrieved metric geometry.",
+    regions: [{ x: 3410, y: 440, width: 454, height: 340, radius: 22 }],
+  },
+  {
+    id: "policy",
+    index: "05",
+    label: "Policy interface",
+    center: 2113,
+    role: "policy",
+    description:
+      "The same observation tokens condition either StereoPatch-ACT’s transformer decoder or StereoPatch-DP’s denoising network; both output an action chunk.",
+    regions: [
+      { x: 28, y: 1182, width: 698, height: 535, radius: 26 },
+      { x: 1120, y: 1182, width: 1987, height: 535, radius: 26 },
+      { x: 3238, y: 1228, width: 630, height: 380, radius: 22 },
+    ],
+  },
+];
+---
+
+<section class="section method-section" id="method" aria-labelledby="method-title">
+  <div class="section-heading section-heading-wide">
+    <p class="kicker">01 · Representation interface</p>
+    <h2 id="method-title">Resolve RGB–depth association <em>before</em> policy decoding.</h2>
+    <p>
+      The policy receives one RGB-indexed field enriched with metric evidence—not two
+      unbound token sets that scarce demonstrations must associate while learning control.
+    </p>
+  </div>
+
+  <figure class="paper-method-figure" data-method-inspector data-reveal>
+    <div
+      class="method-figure-scroll"
+      tabindex="0"
+      role="region"
+      aria-label="StereoPatch method figure; use the stage controls below to inspect modules, or scroll horizontally on a narrow screen"
+    >
+      <div class="method-figure-stage" data-method-stage data-active-method={defaultStage}>
+        <img
+          src="media/method/stereopatch-method-transparent.png"
+          alt="StereoPatch token construction from registered RGB and depth, followed by StereoPatch-ACT and StereoPatch-DP policy interfaces"
+          width="3874"
+          height="1728"
+          loading="lazy"
+          decoding="async"
+        />
+
+        <svg
+          class="method-focus-layer"
+          viewBox="0 0 3874 1728"
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            {
+              stages.map((stage) => (
+                <mask
+                  id={`method-mask-${stage.id}`}
+                  maskUnits="userSpaceOnUse"
+                  x="0"
+                  y="0"
+                  width="3874"
+                  height="1728"
+                >
+                  <rect x="0" y="0" width="3874" height="1728" fill="white" />
+                  {stage.regions.map((region) => (
+                    <rect
+                      x={region.x}
+                      y={region.y}
+                      width={region.width}
+                      height={region.height}
+                      rx={region.radius}
+                      fill="black"
+                    />
+                  ))}
+                </mask>
+              ))
+            }
+          </defs>
+
+          {
+            stages.map((stage) => (
+              <g
+                class:list={[
+                  "method-focus",
+                  `method-focus-${stage.role}`,
+                  stage.id === defaultStage && "is-active",
+                ]}
+                data-method-focus={stage.id}
+              >
+                <rect
+                  class="method-focus-dim"
+                  x="0"
+                  y="0"
+                  width="3874"
+                  height="1728"
+                  mask={`url(#method-mask-${stage.id})`}
+                />
+                {stage.regions.map((region) => (
+                  <rect
+                    class="method-focus-outline"
+                    x={region.x}
+                    y={region.y}
+                    width={region.width}
+                    height={region.height}
+                    rx={region.radius}
+                    vector-effect="non-scaling-stroke"
+                  />
+                ))}
+              </g>
+            ))
+          }
+        </svg>
+
+        <div class="method-hotspots" aria-label="Clickable modules in the StereoPatch method figure">
+          {
+            stages.flatMap((methodStage) =>
+              methodStage.regions.map((region, regionIndex) => (
+                <button
+                  class:list={["method-hotspot", methodStage.id === defaultStage && "is-active"]}
+                  type="button"
+                  data-method-hotspot={methodStage.id}
+                  aria-label={`Inspect ${methodStage.label}${methodStage.regions.length > 1 ? `, region ${regionIndex + 1}` : ""}`}
+                  aria-controls={`method-panel-${methodStage.id}`}
+                  aria-pressed={methodStage.id === defaultStage ? "true" : "false"}
+                  style={`left:${(region.x / 3874) * 100}%;top:${(region.y / 1728) * 100}%;width:${(region.width / 3874) * 100}%;height:${(region.height / 1728) * 100}%;`}
+                >
+                  <span aria-hidden="true">{methodStage.index}</span>
+                </button>
+              )),
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="method-inspector">
+      <div class="method-tabs" role="tablist" aria-label="StereoPatch method stages">
+        {
+          stages.map((stage) => (
+            <button
+              class:list={["method-tab", stage.id === defaultStage && "is-active"]}
+              id={`method-tab-${stage.id}`}
+              type="button"
+              role="tab"
+              aria-selected={stage.id === defaultStage ? "true" : "false"}
+              aria-controls={`method-panel-${stage.id}`}
+              tabindex={stage.id === defaultStage ? 0 : -1}
+              data-method-tab={stage.id}
+              data-method-center={stage.center}
+            >
+              <span class="method-tab-index" aria-hidden="true">{stage.index}</span>
+              <span class="method-tab-label">{stage.label}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="method-panels" aria-live="polite">
+        {
+          stages.map((stage) => (
+            <section
+              class="method-panel"
+              id={`method-panel-${stage.id}`}
+              role="tabpanel"
+              aria-labelledby={`method-tab-${stage.id}`}
+              tabindex="0"
+              data-method-panel={stage.id}
+              hidden={stage.id !== defaultStage}
+            >
+              <p class="method-panel-index">Stage {stage.index}</p>
+              <h3>{stage.label}</h3>
+              <p>{stage.description}</p>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+
+    <figcaption>
+      The exact Method figure used in the paper: select a module directly in the figure—or use the stage rail—to trace how registered geometry enters RGB patch addresses before either policy head decodes actions.
+    </figcaption>
+  </figure>
+
+  <p class="method-boundary">
+    <strong>What patch-aligned means.</strong> A calibrated stereo camera yields top-view RGB and registered metric depth. The streams share a lattice and explicit offset structure;
+    StereoPatch does not assume one-to-one token matching or a fixed grid resolution.
+  </p>
+</section>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yananzhou.me/stereopatch/sitemap.xml

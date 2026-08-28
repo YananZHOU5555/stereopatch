@@ -1,0 +1,119 @@
+---
+import { dataEfficiency } from "../content/evidence";
+
+const chartWidth = 1200;
+const chartHeight = 430;
+const plotTop = 88;
+const plotBottom = 338;
+const panelWidth = 452;
+const panelLeft = [82, 666];
+const xOffsets = [0, panelWidth / 2, panelWidth];
+const kValues = [1, 2, 4];
+const y = (value: number) => plotBottom - (value / 100) * (plotBottom - plotTop);
+const rate = (value: number, denominator: number) => (100 * value) / denominator;
+
+const panels = dataEfficiency.map((panel, panelIndex) => ({
+  ...panel,
+  x: panelLeft[panelIndex],
+  curves: panel.curves.map((curve, curveIndex) => {
+    const points = curve.values.map((value, pointIndex) => ({
+      value,
+      percent: rate(value, panel.denominator),
+      x: panelLeft[panelIndex] + xOffsets[pointIndex],
+      y: y(rate(value, panel.denominator)),
+    }));
+    return {
+      ...curve,
+      curveIndex,
+      points,
+      polyline: points.map((point) => `${point.x},${point.y}`).join(" "),
+    };
+  }),
+}));
+---
+
+<figure class="efficiency-chart" data-reveal data-efficiency-chart>
+  <header class="efficiency-header">
+    <div>
+      <span class="chart-overline">Held-out demonstration efficiency</span>
+      <h4>Fixed evaluation coordinates · varying trajectories per retained anchor</h4>
+    </div>
+    <div class="efficiency-legend" aria-label="Chart legend">
+      <span class="legend-method legend-reference"><i></i>π<sub>0.5</sub>-FT</span>
+      <span class="legend-method legend-fusion"><i></i>StereoPatch</span>
+      <span class="legend-line legend-full"><i></i>Full anchors</span>
+      <span class="legend-line legend-reduced"><i></i>Reduced anchors</span>
+    </div>
+  </header>
+
+  <div class="efficiency-plot-scroll" tabindex="0" role="region" aria-label="Scrollable held-out demonstration-efficiency plots">
+  <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-labelledby="efficiency-title efficiency-desc">
+    <title id="efficiency-title">Held-out success as trajectories per training anchor increase</title>
+    <desc id="efficiency-desc">Placement and object-picking curves compare pi zero point five fine-tuning with the task-matched StereoPatch head under full and reduced training-anchor coverage.</desc>
+
+    {panels.map((panel) => (
+      <g class="efficiency-panel">
+        <text class="efficiency-panel-title" x={panel.x} y="34">{panel.title}</text>
+        <text class="efficiency-panel-meta" x={panel.x} y="59">
+          Full A={panel.fullAnchors} · reduced A={panel.reducedAnchors} · held-out n={panel.denominator}
+        </text>
+
+        {[0, 25, 50, 75, 100].map((tick) => (
+          <g class="efficiency-gridline">
+            <line x1={panel.x} x2={panel.x + panelWidth} y1={y(tick)} y2={y(tick)} />
+            {panel.id === "placement" && <text x={panel.x - 18} y={y(tick) + 5} text-anchor="end">{tick}</text>}
+          </g>
+        ))}
+
+        <line class="efficiency-axis" x1={panel.x} x2={panel.x + panelWidth} y1={plotBottom} y2={plotBottom} />
+        {kValues.map((value, index) => (
+          <g class="efficiency-x-tick">
+            <line x1={panel.x + xOffsets[index]} x2={panel.x + xOffsets[index]} y1={plotBottom} y2={plotBottom + 8} />
+            <text x={panel.x + xOffsets[index]} y={plotBottom + 29} text-anchor="middle">{value}</text>
+          </g>
+        ))}
+
+        {panel.curves.map((curve) => (
+          <g class:list={["efficiency-series", `tone-${curve.tone}`, curve.coverage === "Reduced" && "is-reduced"]} style={`--series-delay:${curve.curveIndex * 90}ms`}>
+            <polyline class="efficiency-line" pathLength="1" points={curve.polyline} />
+            {curve.points.map((point, pointIndex) => (
+              <g class="efficiency-point" tabindex="0" style={`--point-delay:${curve.curveIndex * 90 + pointIndex * 70}ms`}>
+                <title>{panel.title}, {curve.method}, {curve.coverage} anchors, K={kValues[pointIndex]}: {point.value}/{panel.denominator} ({point.percent.toFixed(1)}%)</title>
+                {curve.tone === "fusion"
+                  ? <path d={`M ${point.x} ${point.y - 9} L ${point.x + 9} ${point.y} L ${point.x} ${point.y + 9} L ${point.x - 9} ${point.y} Z`} />
+                  : <circle cx={point.x} cy={point.y} r="7" />}
+                <g class="efficiency-tooltip" transform={`translate(${point.x} ${point.y - 18})`}>
+                  <rect x="-38" y="-23" width="76" height="22" rx="3" />
+                  <text text-anchor="middle" y="-8">{point.value}/{panel.denominator} · {point.percent.toFixed(1)}%</text>
+                </g>
+              </g>
+            ))}
+          </g>
+        ))}
+      </g>
+    ))}
+
+    <text class="efficiency-y-label" transform="translate(22 238) rotate(-90)" text-anchor="middle">Held-out success (%)</text>
+    <text class="efficiency-x-label" x={chartWidth / 2} y="413" text-anchor="middle">Trajectories per retained anchor, K</text>
+  </svg>
+  </div>
+  <p class="mobile-scroll-hint" aria-hidden="true">Swipe to compare both task panels →</p>
+
+  <div class="efficiency-counts" aria-label="Exact plotted success counts">
+    {panels.map((panel) => (
+      <section>
+        <div class="efficiency-count-head"><strong>{panel.title.split(" · ")[0]}</strong><span>K = 1 · 2 · 4</span></div>
+        {panel.curves.map((curve) => (
+          <p class:list={[`tone-${curve.tone}`, curve.coverage === "Reduced" && "is-reduced"]}>
+            <span>{curve.method} · {curve.coverage}</span>
+            <b>{curve.values.map((value) => `${value}/${panel.denominator}`).join("  ·  ")}</b>
+          </p>
+        ))}
+      </section>
+    ))}
+  </div>
+
+  <figcaption>
+    Frozen measured summary counts. Full/reduced changes training-anchor coverage only; every curve uses the same fixed held-out coordinates. No confidence interval is added because position-level atomic outcomes were not retained.
+  </figcaption>
+</figure>
