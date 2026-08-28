@@ -71,7 +71,8 @@ const resultPercent = (claim: (typeof claims)[number]) =>
         preload="none"
         poster="media/video-4k60/bowl.jpg"
         data-evidence-video
-        data-src={`${taskMediaRoot}/bowl.mp4`}
+        data-src={`${taskMediaRoot}/bowl-1080p60.mp4`}
+        data-src-mobile={`${taskMediaRoot}/bowl-720p30.mp4`}
         data-priority="hero"
         aria-label="Complete real-robot bowl-extraction rollout shown at four-times speed"
       ></video>
@@ -81,7 +82,7 @@ const resultPercent = (claim: (typeof claims)[number]) =>
     </div>
     <figcaption class="media-caption media-caption-wide">
       <span><strong>Bowl extraction</strong> · complete edited real-robot execution</span>
-      <span>Autonomous · multi-position · 4× edited playback · 4K60 qualitative rollout</span>
+      <span>Autonomous · multi-position · 4× edited playback · 4K60 source / adaptive stream</span>
     </figcaption>
   </figure>
 
