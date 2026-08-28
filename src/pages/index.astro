@@ -133,6 +133,7 @@ const description =
       videos = Array.from(document.querySelectorAll<HTMLVideoElement>("video[data-evidence-video]"));
       active: HTMLVideoElement | null = null;
       observer: IntersectionObserver;
+      unloadTimers = new WeakMap<HTMLVideoElement, number>();
 
       constructor() {
         this.observer = new IntersectionObserver((entries) => this.onIntersect(entries), {
@@ -161,17 +162,54 @@ const description =
         reduceMotion.addEventListener("change", () => this.selectBest());
       }
 
+      preferredSource(video: HTMLVideoElement) {
+        const connection = (navigator as Navigator & {
+          connection?: { saveData?: boolean; effectiveType?: string };
+        }).connection;
+        const constrained = Boolean(
+          connection?.saveData ||
+          ["slow-2g", "2g", "3g"].includes(connection?.effectiveType || ""),
+        );
+        const compact = constrained || window.matchMedia("(max-width: 720px)").matches;
+        return (compact && video.dataset.srcMobile) || video.dataset.src || "";
+      }
+
+      cancelRelease(video: HTMLVideoElement) {
+        const timer = this.unloadTimers.get(video);
+        if (timer != null) window.clearTimeout(timer);
+        this.unloadTimers.delete(video);
+      }
+
+      scheduleRelease(video: HTMLVideoElement, delay = 5000) {
+        this.cancelRelease(video);
+        this.unloadTimers.set(video, window.setTimeout(() => {
+          if (this.active === video) return;
+          video.pause();
+          video.removeAttribute("src");
+          video.load();
+          delete video.dataset.activeQuality;
+          this.unloadTimers.delete(video);
+        }, delay));
+      }
+
       load(video: HTMLVideoElement) {
-        if (video.src || !video.dataset.src) return;
-        video.src = video.dataset.src;
+        const source = this.preferredSource(video);
+        if (!source || video.getAttribute("src") === source) return;
+        video.src = source;
+        video.dataset.activeQuality = source === video.dataset.srcMobile ? "720p30" : "1080p60";
         video.load();
       }
 
       async play(video: HTMLVideoElement, userInitiated = false) {
         if ((!userInitiated && reduceMotion.matches) || document.hidden) return;
         delete video.dataset.userPaused;
+        this.cancelRelease(video);
         this.load(video);
-        this.videos.forEach((other) => { if (other !== video) other.pause(); });
+        this.videos.forEach((other) => {
+          if (other === video) return;
+          other.pause();
+          this.scheduleRelease(other, 3000);
+        });
         this.active = video;
         try { await video.play(); } catch { this.syncButton(video, false); }
       }
@@ -185,7 +223,10 @@ const description =
       }
 
       pauseAll() {
-        this.videos.forEach((video) => video.pause());
+        this.videos.forEach((video) => {
+          video.pause();
+          this.scheduleRelease(video);
+        });
         this.active = null;
       }
 
@@ -202,11 +243,12 @@ const description =
         entries.forEach((entry) => {
           const video = entry.target as HTMLVideoElement;
           video.dataset.visibleRatio = String(entry.intersectionRatio);
-          if (!reduceMotion.matches && entry.isIntersecting && entry.intersectionRatio > 0.05) this.load(video);
           if (!entry.isIntersecting || entry.intersectionRatio <= 0.05) {
             video.pause();
             if (this.active === video) this.active = null;
+            this.scheduleRelease(video);
           }
+          else this.cancelRelease(video);
         });
         this.selectBest();
       }

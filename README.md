@@ -18,6 +18,12 @@ pnpm dev
 - RQ5 serial rows are componentwise latency budgets, not synchronized end-to-end quantiles.
 - Evidence motion is progressive enhancement: exact values remain visible without JavaScript and all animation is disabled under reduced-motion preferences.
 
+## Media delivery
+
+- The original edited 4K60 rollouts remain archived in the `media-v1` GitHub Release.
+- The page selects complete 1080p60 streams on desktop and complete 720p30 streams on compact or constrained connections; timing and playback semantics are unchanged.
+- Evidence videos receive a source only when selected for playback. Inactive and offscreen players are paused and released to keep one ordinary decoder active.
+
 ## Intended deployment
 
 - Source: an independent GitHub repository named `stereopatch`.

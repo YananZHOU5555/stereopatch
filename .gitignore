@@ -9,4 +9,5 @@ qa*.png
 public/media/video-4k60/*.mp4
 public/media/video/
 public/media/video-graded/
+public/media/video-web/
 scripts/__pycache__/
