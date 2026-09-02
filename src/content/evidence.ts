@@ -18,15 +18,11 @@ export interface Claim {
 export interface TaskMedia {
   id: string;
   title: string;
-  question: string;
   src: string;
   srcMobile: string;
   poster: string;
   playback: string;
   duration: string;
-  autonomy: string;
-  coverage: string;
-  caption: string;
   evidenceState: EvidenceState;
 }
 
@@ -99,85 +95,61 @@ export const tasks: TaskMedia[] = [
   {
     id: "placement",
     title: "Placement",
-    question: "Can a destination learned from sparse anchors generalize to held-out coordinates?",
     src: `${taskMediaRoot}/placement-1080p60.mp4`,
     srcMobile: `${taskMediaRoot}/placement-720p30.mp4`,
     poster: "media/video-4k60/placement.jpg",
     playback: "2× playback",
-    duration: "01:03.2 full edit",
-    autonomy: "Autonomous policy rollout",
-    coverage: "Multi-position protocol",
-    caption: "Complete multi-position edit; success rates come from the fixed held-out protocol.",
+    duration: "01:03.2",
     evidenceState: "provided",
   },
   {
     id: "picking",
     title: "Object picking",
-    question: "Can the policy localize a source object outside the demonstrated coordinates?",
     src: `${taskMediaRoot}/picking-1080p60.mp4`,
     srcMobile: `${taskMediaRoot}/picking-720p30.mp4`,
     poster: "media/video-4k60/picking.jpg",
     playback: "2× playback",
-    duration: "00:58.6 full edit",
-    autonomy: "Autonomous policy rollout",
-    coverage: "Multi-position protocol",
-    caption: "Complete multi-position edit; not an independent evaluation denominator.",
+    duration: "00:58.6",
     evidenceState: "provided",
   },
   {
     id: "peg",
     title: "Peg insertion",
-    question: "Does a near-patch-scale target remain usable through grasp and insertion?",
     src: `${taskMediaRoot}/peg-1080p60.mp4`,
     srcMobile: `${taskMediaRoot}/peg-720p30.mp4`,
     poster: "media/video-4k60/peg.jpg",
-    playback: "4× edited playback",
-    duration: "00:18.2 full edit",
-    autonomy: "Autonomous policy rollout",
-    coverage: "Multi-position protocol",
-    caption: "Complete multi-position edit; closed-loop comparisons use 72 trials per condition.",
+    playback: "4× playback",
+    duration: "00:18.2",
     evidenceState: "provided",
   },
   {
     id: "picnic",
     title: "Picnic-bag packing",
-    question: "Can one policy switch task-relevant objects across two manipulation stages?",
     src: `${taskMediaRoot}/picnic-1080p60.mp4`,
     srcMobile: `${taskMediaRoot}/picnic-720p30.mp4`,
     poster: "media/video-4k60/picnic.jpg",
-    playback: "4× edited playback",
-    duration: "01:12.6 full edit",
-    autonomy: "Autonomous policy rollout",
-    coverage: "Multi-position protocol",
-    caption: "Complete multi-position edit; stage counts use 24 trials.",
+    playback: "4× playback",
+    duration: "01:12.6",
     evidenceState: "provided",
   },
   {
     id: "bowl",
     title: "Bowl extraction",
-    question: "Can the policy select contact height when RGB appearance is ambiguous?",
     src: `${taskMediaRoot}/bowl-1080p60.mp4`,
     srcMobile: `${taskMediaRoot}/bowl-720p30.mp4`,
     poster: "media/video-4k60/bowl.jpg",
-    playback: "4× edited playback",
-    duration: "01:09.4 full edit",
-    autonomy: "Autonomous policy rollout",
-    coverage: "Multi-position protocol",
-    caption: "Complete multi-position edit; matched bowl comparisons use 80 trials per method.",
+    playback: "4× playback",
+    duration: "01:09.4",
     evidenceState: "provided",
   },
   {
     id: "cup",
     title: "Cup transfer",
-    question: "Can the policy adjust three-dimensional reach across rack configurations?",
     src: `${taskMediaRoot}/cup-1080p60.mp4`,
     srcMobile: `${taskMediaRoot}/cup-720p30.mp4`,
     poster: "media/video-4k60/cup.jpg",
-    playback: "4× edited playback",
-    duration: "00:21.8 full edit",
-    autonomy: "Autonomous policy rollout",
-    coverage: "Multi-position protocol",
-    caption: "Complete multi-position edit; matched cup comparisons use 20 trials per method.",
+    playback: "4× playback",
+    duration: "00:21.8",
     evidenceState: "provided",
   },
 ];

@@ -39,18 +39,13 @@ import { tasks } from "../content/evidence";
         <div class="task-copy">
           <div class="task-title-row">
             <h3>{task.title}</h3>
-            <span>{task.duration}</span>
+            <div class="task-video-meta" aria-label={`${task.title} video metadata`}>
+              <span>Duration: {task.duration}</span>
+              <span>{task.playback}</span>
+            </div>
           </div>
-          <div class="task-tags" aria-label={`${task.title} video metadata`}>
-            <span>{task.autonomy}</span>
-            <span>{task.coverage}</span>
-            <span>{task.playback}</span>
-          </div>
-          <p class="task-question">{task.question}</p>
-          <p class="task-caption">{task.caption}</p>
         </div>
       </article>
     ))}
   </div>
-  <p class="task-playback-note">Playback multipliers describe video presentation only; policies execute at the recorded control rate.</p>
 </section>

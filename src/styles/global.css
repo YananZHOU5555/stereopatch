@@ -428,7 +428,6 @@ button { color: inherit; }
 .kicker,
 .diagram-label,
 .chart-title-row span,
-.task-title-row span,
 .evidence-number {
   margin: 0 0 14px;
   color: var(--ink-secondary);
@@ -821,12 +820,11 @@ h2 { font-size: clamp(44px, 5.25vw, 78px); line-height: 1.01; }
 .task-card { position: relative; min-width: 0; }
 .task-index { position: absolute; z-index: 3; top: -15px; left: 14px; color: var(--page); font-family: ui-monospace, monospace; font-size: 12px; text-shadow: 0 1px 8px rgba(0,0,0,.35); }
 .task-media { aspect-ratio: 16 / 9; border-radius: 10px; }
-.task-copy { display: grid; gap: 8px; padding-top: 14px; }
+.task-copy { padding-top: 14px; }
 .task-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
 .task-title-row h3 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
-.task-title-row span { margin: 0; font-size: 11px; white-space: nowrap; }
-.task-question { margin: 0; max-width: 55ch; font-size: 16px; }
-.task-caption { margin: 0; color: var(--ink-secondary); font-family: ui-monospace, monospace; font-size: 11px; line-height: 1.45; }
+.task-video-meta { display: flex; align-items: center; gap: 0 12px; color: var(--ink-secondary); font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
+.task-video-meta span + span::before { margin-right: 12px; color: var(--ink-tertiary); content: "·"; }
 
 .evidence-section { padding-bottom: 0; }
 .evidence-block { padding: clamp(52px, 6vw, 82px) 0; border-top: 1px solid var(--border); scroll-margin-top: 76px; }
@@ -1042,11 +1040,6 @@ h2 { font-size: clamp(44px, 5.25vw, 78px); line-height: 1.01; }
 .method-hotspot:hover > span,
 .method-hotspot:focus-visible > span { opacity: 1; transform: none; }
 .method-hotspot:focus-visible { outline: 2px solid var(--fusion-dark); outline-offset: -3px; }
-
-/* Task-video evidence metadata stays outside the footage. */
-.task-tags { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--fusion-dark); font: 10px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .055em; text-transform: uppercase; }
-.task-tags span + span::before { margin-right: 12px; color: var(--ink-tertiary); content: "·"; }
-.task-playback-note { margin: clamp(34px, 4vw, 54px) 0 0; padding-top: 14px; border-top: 1px solid var(--divider); color: var(--ink-secondary); font: 11px/1.5 ui-monospace, monospace; }
 
 /* RQ1 · paper-structured benchmark coverage + complete mixed-provenance table */
 .simulation-paper-layout { display: grid; grid-template-areas: "robomimic behavior" "robofactory behavior"; grid-template-columns: minmax(0, 3fr) minmax(190px, 1fr); gap: 14px 12px; margin-bottom: 26px; }
@@ -1490,8 +1483,7 @@ h2 { font-size: clamp(44px, 5.25vw, 78px); line-height: 1.01; }
 
 @media (max-width: 540px) {
   .task-title-row { align-items: flex-start; flex-direction: column; gap: 2px; }
-  .task-tags { display: grid; gap: 2px; }
-  .task-tags span + span::before { margin-right: 7px; }
+  .task-video-meta { flex-wrap: wrap; white-space: normal; }
   .simulation-suite-tasks,
   .suite-behavior .simulation-suite-tasks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .simulation-suite-heading h5 { font-size: 15px; }
