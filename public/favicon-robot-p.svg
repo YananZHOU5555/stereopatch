@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 720" role="img" aria-labelledby="title">
+  <title id="title">StereoPatch robot P logo</title>
+  <!-- Independent vector mark, following the website's robot-P proportions. -->
+  <g transform="translate(70 27)">
+    <path fill="#111411" d="M160 0H400C499.4 0 580 80.6 580 180V190C580 289.4 499.4 370 400 370H130V630Q130 665 95 665H35Q0 665 0 630V160C0 71.6 71.6 0 160 0Z"/>
+    <rect x="165" y="75" width="305" height="205" rx="64" fill="#f5f4ef"/>
+    <g fill="#111411">
+      <rect x="238" y="139" width="52" height="78" rx="26"/>
+      <rect x="338" y="139" width="52" height="78" rx="26"/>
+    </g>
+    <g fill="#fffefa">
+      <circle cx="253" cy="154" r="7"/>
+      <circle cx="353" cy="154" r="7"/>
+    </g>
+  </g>
+</svg>
